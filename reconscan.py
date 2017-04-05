@@ -144,7 +144,7 @@ def httpEnum(ip_address, port):
     nikto_process.start()
 
     CURLSCAN = "curl -I http://%s" % (ip_address)
-    print bcolors.HEADER + CURLSCAN + bcolors.END
+    print bcolors.HEADER + CURLSCAN + bcolors.ENDC
     curl_results = subprocess.check_output(CURLSCAN, shell=True)
     write_to_file(ip_address, "curl", curl_results)
     HTTPSCAN = "nmap -sV -Pn -vv -p %s --script=http-vhosts,http-userdir-enum,http-apache-negotiation,http-backup-finder,http-config-backup,http-default-accounts,http-methods,http-method-tamper,http-passwd,http-robots.txt,http-devframework,http-enum,http-frontpage-login,http-git,http-iis-webdav-vuln,http-php-version,http-robots.txt,http-shellshock,http-vuln-cve2015-1635 -oN %s/%s_http.nmap %s" % (port, ip_output_dir, ip_address, ip_address)
@@ -336,7 +336,7 @@ def parseResults(results_to_parse, protocol):
         if (protocol in line) and ("open" in line) and not ("Discovered" in line):
             # print line
             while "  " in line:
-                line = line.replace("  ", " ");
+                line = line.replace("  ", " ")
             linesplit= line.split(" ")
             service = linesplit[2] # grab the service name
 
