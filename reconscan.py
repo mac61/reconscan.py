@@ -115,8 +115,7 @@ def write_to_file(ip_address, enum_type, data, port="0"):
 
 def dirb(ip_address, port, url_start):
     print bcolors.HEADER + "INFO: Starting dirb scan for " + ip_address + bcolors.ENDC
-    DIRBSCAN = "dirb " + url_start + "://" + ip_address + ":" + port + " -o " + ip_output_dir + "dirb-" + ip_address + ".txt -r"
-    #DIRBSCAN = "dirb %s://%s:%s -o /root/oscp/exam/%s/dirb-%s.txt -r" % (url_start, ip_address, port, ip_address, ip_address)
+    DIRBSCAN = "dirb %s://%s:%s -o %s/dirb-%s.txt -r" % (url_start, ip_address, port, ip_output_dir, ip_address)
     print bcolors.HEADER + DIRBSCAN + bcolors.ENDC
     results_dirb = subprocess.check_output(DIRBSCAN, shell=True)
     print bcolors.OKGREEN + "INFO: RESULT BELOW - Finished with dirb scan for " + ip_address + bcolors.ENDC
