@@ -18,6 +18,10 @@ import socket
 # Change replace to sed:
 # sed 's|literal_pattern|replacement_string|g'
 
+#Notes:
+# dirb output is too large to be written to the template
+# enum4linux needs a user list, currently it doesn't do anything
+
 start = time.time()
 
 ip_output_dir = ""
