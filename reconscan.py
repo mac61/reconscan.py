@@ -13,6 +13,8 @@ import socket
 # turn the enum into an actual enum
 # HTTP Scan should be added to the doc
 
+# syn scan doesn't print it's command line
+
 # nikto and dirb can both run on HTTP and HTTPS - should probably modfify them to do so in template
 # Why isn't smtp being printed into the file?
 
@@ -89,56 +91,11 @@ def write_to_file(ip_address, string_to_replace, data):
                 continue
         # write the changed data
         with open(filename, "w") as f:
-            print bcolors.OKGREEN + "INFO: Writing " + string_to_replace + " to template files:\n" + file_path_linux + \
-                  "   \n" + file_path_windows + bcolors.ENDC
+            print bcolors.OKGREEN + "INFO: Writing " + string_to_replace + " to template files:\n" + filename +\
+                  bcolors.ENDC
             while string_to_replace in contents:
                 contents = contents.replace(string_to_replace, data)
             f.write(contents)
-
-#def write_to_file(ip_address, enum_type, data, port="0"):
-
-#    file_path_linux = ip_output_dir + "/mapping-linux.md"
-#    file_path_windows = ip_output_dir + "/mapping-windows.md"
-#    paths = [file_path_linux, file_path_windows]
-#    print bcolors.OKGREEN + "INFO: Writing " + enum_type + " to template files:\n" + file_path_linux + "   \n" + \
-#          file_path_windows + bcolors.ENDC
-
-#    for path in paths:
-#        if enum_type == "syn_scan":
-#            subprocess.check_output("replace INSERT_SYN_SCAN \"" + data + "\"  -- " + path, shell=True)
-#        elif enum_type == "portscan":
-#            subprocess.check_output("replace INSERT_TCP_SCAN \"" + data + "\"  -- " + path, shell=True)
-#        elif enum_type == "dirb":
-#            subprocess.check_output("replace INSERT_DIRB_SCAN \"" + data + "\"  -- " + path, shell=True)
-#        elif enum_type == "nikto":
-#            subprocess.check_output("replace INSERT_NIKTO_SCAN \"" + data + "\"  -- " + path, shell=True)
-#        elif enum_type == "ftp-connect":
-#            subprocess.check_output("replace INSERT_FTP_TEST \"" + data + "\"  -- " + path, shell=True)
-#        elif enum_type == "smtp-connect":
-#            subprocess.check_output("replace INSERT_SMTP_CONNECT \"" + data + "\"  -- " + path, shell=True)
-#        elif enum_type == "ssh-connect":
-#            subprocess.check_output("replace INSERT_SSH_CONNECT \"" + data + "\"  -- " + path, shell=True)
-#        elif enum_type == "pop3-connect":
-#            subprocess.check_output("replace INSERT_POP3_CONNECT \"" + data + "\"  -- " + path, shell=True)
-#        elif enum_type == "curl":
-#            subprocess.check_output("replace INSERT_CURL_HEADER \"" + data + "\"  -- " + path, shell=True)
-#        elif enum_type == "udp_scan":
-#            subprocess.check_output("replace INSERT_UDP_SCAN \"" + data + "\"  -- " + path, shell=True)
-#        elif enum_type == "script_scan":
-#            subprocess.check_output("replace INSERT_SCRIPT_SCAN \"" + data + "\"  -- " + path, shell=True)
-#        elif enum_type == "full_port_scan":
-#            subprocess.check_output("replace INSERT_FULL_PORT_SCAN \"" + data + "\"  -- " + path, shell=True)
-#        elif enum_type == "monster_scan":
-#            subprocess.check_output("replace INSERT_MONSTER_SCAN \"" + data + "\"  -- " + path, shell=True)
-#        elif enum_type == "smb_nmap":
-#            string_wtih_port = "replace INSERT_SMB_SCAN_%s \"%s\"  -- %s" % (port, data, path)
-#            subprocess.check_output(string_wtih_port, shell=True)
-#        elif enum_type == "smb_enum":
-#            string_wtih_port = "replace INSERT_ENUM4LINUX_SCAN_%s \"%s\"  -- %s" % (port, data, path)
-#            subprocess.check_output(string_wtih_port, shell=True)
-#        else:
-#            print "Incorrect enum type " + enum_type
-#    return
 
 def dirb(ip_address, port, url_start):
     print bcolors.HEADER + "INFO: Starting dirb scan for " + ip_address + bcolors.ENDC
@@ -259,12 +216,20 @@ def smbNmap(ip_address, port):
 # TODO improve this function
 # TODO make sure it's being called appropriately
 def smbEnum(ip_address, port):
+    print_things = True
     print "INFO: Detected SMB on " + ip_address + ":" + port
     enum4linux = "enum4linux -a %s > %s/enum4linux_%s" % (ip_address, ip_output_dir, ip_address)
-    enum4linux_results = subprocess.check_output(enum4linux, shell=True)
-    print bcolors.OKGREEN + "INFO: CHECK FILE - Finished with ENUM4LINUX-scan for " + ip_address + bcolors.ENDC
-    print enum4linux_results
-    write_to_file(ip_address, "INSERT_ENUM4LINUX_SCAN", enum4linux_results)
+    
+    try:
+        enum4linux_results = subprocess.check_output(enum4linux, shell=True)
+    except:
+        print bcolors.FAIL + "ERROR: enum4linux execution failed" + bcolors.ENDC
+        print_things = False
+
+    if print_things:
+        print bcolors.OKGREEN + "INFO: CHECK FILE - Finished with ENUM4LINUX-scan for " + ip_address + bcolors.ENDC
+        print enum4linux_results
+        write_to_file(ip_address, "INSERT_ENUM4LINUX_SCAN", enum4linux_results)
     return
 
 # TODO add this to the template?
